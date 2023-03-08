@@ -72,27 +72,30 @@ This example demonstrates how applying the Interface Segregation Principle can h
 
 ## 2nd Example
 
-The dependency injection principle states that high level code should never depend on low level interfaces, and should instead use abstractions. It’s all about decoupling code.
+The *interface segregation principle* states that an entity should never be forced to implement an interface that contains elements which it will never use. For example, a Penguin should never be forced to implement a Bird interface if that Bird interface includes functionality relating to flying, as penguins (spoiler alert) cannot fly.
 
-Not following? I don’t blame you, but it’s surprisingly simple.
+Now, this functionality is a little more difficult to demonstrate using JavaScript, due to its lack of interfaces. However, we can demonstrate it by using composition.
 
-Let’s say we have a piece of software that runs an online store, and within that software one of the classes *(PurchaseHandler)* handles the final purchase. This class is capable of charging the user’s credit card, and does so by using a PayPal API:
+Composition is a subject all by itself, but I’ll give a very high level introduction: Instead of inheriting an entire class, we can instead add chunks of functionality to a class. Here’s an example that actually addresses the *interface segregation principle*:
 
 ```js
-class PurchaseHandler {
-    processPayment(paymentDetails, amount) {
-        // Complicated, PayPal specific logic goes here
-        const paymentSuccess = PayPal.requestPayment(paymentDetails, amount);
+class Penguin {}
 
-        if (paymentSuccess) {
-            // Do something
-            return true;
-        }
+class Bird {}
 
-        // Do something
-        return false;
-    }
-}
+const flyer = {
+    fly() {
+        console.log(`Flap flap, I'm flying!`);
+    },
+};
+
+Object.assign(Bird.prototype, flyer);
+
+const bird = new Bird();
+bird.fly(); // Outputs 'Flap flap, I'm flying!'
+
+const penguin = new Penguin();
+penguin.fly(); // 'Error: penguin.fly is not a function'
 ```
 The problem here is that if we change from PayPal to Square (another payment processor) in 6 months time, this code breaks. We need to go back and swap out our PayPal API calls for Square API calls. But in addition, what if the Square API wants different types of data? Or perhaps it wants us to “stage” a payment first, and then to process it once staging has completed?
 
@@ -117,12 +120,7 @@ class PurchaseHandler {
         return false;
     }
 }
-
-class PaymentHandler {
-    requestPayment(paymentDetails, amount) {
-        // Complicated, PayPal specific logic goes here
-        return PayPal.requestPayment(paymentDetails, amount);
-    }
-}
 ```
-Now you may be looking at this and thinking “but wait, that’s way more code”, and you’d be right. Like many of the SOLID principles (and indeed OO principles in general), the objective is less about writing less code or writing it quicker, and more about writing better code. The above change will save you days or maybe even weeks further down the line, in exchange for spending a few hours on it now.
+What this example does is to add the flying functionality (or interface) only to the class(es) that require it. This means that penguins won’t be given the ability to fly, whereas birds will.
+
+This is one method of adhering to the interface segregation principle, but it is a fairly rough example (as, once again, JavaScript doesn’t play well with interfaces).
