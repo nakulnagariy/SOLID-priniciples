@@ -97,30 +97,6 @@ bird.fly(); // Outputs 'Flap flap, I'm flying!'
 const penguin = new Penguin();
 penguin.fly(); // 'Error: penguin.fly is not a function'
 ```
-The problem here is that if we change from PayPal to Square (another payment processor) in 6 months time, this code breaks. We need to go back and swap out our PayPal API calls for Square API calls. But in addition, what if the Square API wants different types of data? Or perhaps it wants us to “stage” a payment first, and then to process it once staging has completed?
-
-That’s bad, and so we need to abstract the functionality out instead.
-
-Rather than directly call the PayPal API from our payment page, we’ll instead create another class called PaymentHandler. The interface for this class will remain the same no matter what underlying payment system we use, even if the two systems are completely different. We’ll still need to make changes to the PaymentHandler interface if we change payment processor, but our higher level interface remains unchanged.
-
-```js
-class PurchaseHandler {
-    processPayment(paymentDetails, amount) {
-        const paymentSuccess = PaymentHandler.requestPayment(
-            paymentDetails,
-            amount
-        );
-
-        if (paymentSuccess) {
-            // Do something
-            return true;
-        }
-
-        // Do something
-        return false;
-    }
-}
-```
 What this example does is to add the flying functionality (or interface) only to the class(es) that require it. This means that penguins won’t be given the ability to fly, whereas birds will.
 
 This is one method of adhering to the interface segregation principle, but it is a fairly rough example (as, once again, JavaScript doesn’t play well with interfaces).
